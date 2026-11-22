@@ -26,6 +26,13 @@ return {
       {
         "<leader>fg",
         function()
+          require("telescope.builtin").live_grep()
+        end,
+        desc = "Search in project",
+      },
+      {
+        "<leader>fc",
+        function()
           require("telescope.builtin").live_grep({
             cwd = vim.fn.stdpath("config"),
             additional_args = function()

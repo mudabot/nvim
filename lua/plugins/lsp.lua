@@ -1,68 +1,39 @@
+-- LSP stack for Neovim 0.11+/0.12 using the built-in vim.lsp.config / vim.lsp.enable.
+-- mason-lspconfig v2 installs servers (ensure_installed) and auto-enables them;
+-- it no longer has `handlers` or `automatic_installation`.
 return {
-	{
-		"mason-org/mason.nvim",
-		cmd = "Mason",
-		opts = {
-			ui = { border = "rounded" },
-		},
-	},
-	{
-		"mason-org/mason-lspconfig.nvim",
-		dependencies = { "mason-org/mason.nvim", "neovim/nvim-lspconfig" },
-		opts = {
-			ensure_installed = {
-				"lua_ls",
-				"pyright",
-				"bashls",
-				"jsonls",
-				"yamlls",
-			},
-			automatic_installation = true,
-			handlers = {
-				function(server)
-					local capabilities = vim.lsp.protocol.make_client_capabilities()
-					local ok, blink = pcall(require, "blink.cmp")
-					if ok then
-						capabilities = blink.get_lsp_capabilities(capabilities)
-					end
-
-					require("lspconfig")[server].setup({
-						capabilities = capabilities,
-					})
-				end,
-				lua_ls = function()
-					local capabilities = vim.lsp.protocol.make_client_capabilities()
-					local ok, blink = pcall(require, "blink.cmp")
-					if ok then
-						capabilities = blink.get_lsp_capabilities(capabilities)
-					end
-
-					require("lspconfig").lua_ls.setup({
-						capabilities = capabilities,
-						settings = {
-							Lua = {
-								workspace = { checkThirdParty = false },
-								telemetry = { enable = false },
-							},
-						},
-					})
-				end,
-			},
-		},
-	},
 	{
 		"neovim/nvim-lspconfig",
 		event = { "BufReadPre", "BufNewFile" },
 		dependencies = {
-			"mason-org/mason.nvim",
-			"mason-org/mason-lspconfig.nvim",
+			{ "mason-org/mason.nvim", cmd = "Mason", opts = { ui = { border = "rounded" } } },
 			{
-				"folke/lazydev.nvim",
-				ft = "lua",
-				opts = {},
+				"mason-org/mason-lspconfig.nvim",
+				opts = {
+					-- NOTE: pyright, bashls, jsonls and yamlls are npm packages -> need Node/npm.
+					ensure_installed = { "lua_ls", "pyright", "bashls", "jsonls", "yamlls" },
+					automatic_enable = true,
+				},
 			},
+			{ "folke/lazydev.nvim", ft = "lua", opts = {} },
+			"saghen/blink.cmp",
 		},
 		config = function()
+			-- Capabilities for every server (blink.cmp completion features)
+			local ok, blink = pcall(require, "blink.cmp")
+			if ok then
+				vim.lsp.config("*", { capabilities = blink.get_lsp_capabilities() })
+			end
+
+			vim.lsp.config("lua_ls", {
+				settings = {
+					Lua = {
+						workspace = { checkThirdParty = false },
+						telemetry = { enable = false },
+					},
+				},
+			})
+
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }),
 				callback = function(ev)
@@ -79,8 +50,12 @@ return {
 					map("<leader>rn", vim.lsp.buf.rename, "Rename symbol")
 					map("<leader>ca", vim.lsp.buf.code_action, "Code action")
 					map("<leader>d", vim.diagnostic.open_float, "Line diagnostics")
-					map("[d", vim.diagnostic.goto_prev, "Previous diagnostic")
-					map("]d", vim.diagnostic.goto_next, "Next diagnostic")
+					map("[d", function()
+						vim.diagnostic.jump({ count = -1, float = true })
+					end, "Previous diagnostic")
+					map("]d", function()
+						vim.diagnostic.jump({ count = 1, float = true })
+					end, "Next diagnostic")
 
 					if client and client:supports_method("textDocument/inlayHint") then
 						vim.lsp.inlay_hint.enable(true, { bufnr = buf })
@@ -97,6 +72,7 @@ return {
 			})
 		end,
 	},
+
 	{
 		"saghen/blink.cmp",
 		version = "1.*",
@@ -110,18 +86,29 @@ return {
 			},
 			sources = {
 				default = { "lsp", "path", "snippets", "buffer" },
+				per_filetype = {
+					lua = { inherit_defaults = true, "lazydev" },
+				},
+				providers = {
+					lazydev = {
+						name = "LazyDev",
+						module = "lazydev.integrations.blink",
+						score_offset = 100,
+					},
+				},
 			},
 			fuzzy = { implementation = "prefer_rust_with_warning" },
 		},
 		opts_extend = { "sources.default" },
 	},
+
 	{
 		"stevearc/conform.nvim",
 		event = { "BufWritePre" },
 		cmd = { "ConformInfo" },
 		keys = {
 			{
-				"<leader>f",
+				"<leader>cf", -- was <leader>f, which shadowed <leader>ff/fg/fb/fh
 				function()
 					require("conform").format({ async = true, lsp_format = "fallback" })
 				end,
@@ -144,6 +131,17 @@ return {
 				timeout_ms = 500,
 				lsp_format = "fallback",
 			},
+		},
+	},
+
+	-- Installs the formatters conform expects (mason-lspconfig only handles LSP servers).
+	-- prettier needs Node/npm.
+	{
+		"WhoIsSethDaniel/mason-tool-installer.nvim",
+		lazy = "false,",
+		dependencies = { "mason-org/mason.nvim" },
+		opts = {
+			ensure_installed = { "stylua", "black", "isort", "prettier", "shfmt" },
 		},
 	},
 }

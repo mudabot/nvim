@@ -2,10 +2,8 @@ return {
 	"folke/which-key.nvim",
 	event = "VeryLazy",
 	opts = {
-		init = function()
-			vim.o.timeout = true
-			vim.o.timeoutlen = 300
-		end,
+		preset = "helix",
+		delay = 300,
 
 		triggers = {
 			{ "<leader>", mode = { "n", "v", "o" } },
@@ -15,10 +13,7 @@ return {
 		plugins = {
 			marks = true,
 			registers = true,
-			spelling = {
-				enabled = true,
-				suggestions = 20,
-			},
+			spelling = { enabled = true, suggestions = 20 },
 			presets = {
 				operators = true,
 				motions = true,
@@ -37,37 +32,15 @@ return {
 			title_pos = "center",
 		},
 
-		layout = {
-			align = "center",
-			spacing = 3,
-			width = nil,
-			height = nil,
-		},
-
-		sort = {
-			"local",
-			"order",
-			"group",
-			"alphanum",
-			"mod",
-			"lower",
-			"icase",
-			"desc",
-			"manual",
-		},
-
 		icons = {
 			breadcrumb = "»",
 			separator = "➜",
-			group = "",
+			group = "+",
 			ellipsis = "…",
 			mappings = true,
 			colors = true,
 			keys = {},
 		},
-
-		show_help = true,
-		show_keys = true,
 	},
 
 	keys = {

@@ -1,8 +1,5 @@
 local map = vim.keymap.set
 
--- Leader key (if not already set in init.lua)
-vim.g.mapleader = " "
-
 -- ============================================================
 -- Basic save / quit
 -- ============================================================
@@ -45,33 +42,7 @@ map("n", "<leader>e", function()
 	require("oil").open_float()
 end, { desc = "Open file explorer (Oil)" })
 
--- ============================================================
--- Telescope / find operations (<leader>f prefix)
--- ============================================================
-
-map("n", "<leader>ff", function()
-	require("telescope.builtin").find_files({ hidden = true })
-end, { desc = "Find files (inc. hidden)" })
-
-map("n", "<leader>fb", function()
-	require("telescope.builtin").buffers()
-end, { desc = "Buffers" })
-
-map("n", "<leader>fg", function()
-	require("telescope.builtin").live_grep()
-end, { desc = "Search in project" })
-
-map("n", "<leader>fh", function()
-	require("telescope.builtin").help_tags()
-end, { desc = "Help tags" })
-
-map("n", "<leader><leader>f", function()
-	vim.lsp.buf.format({ async = true })
-end, { desc = "Format buffer" })
--- If using conform.nvim instead:
--- map("n", "<leader><leader>f", function()
---   require("conform").format({ async = true })
--- end, { desc = "Format buffer" })
+-- Telescope (<leader>f*) and formatting (<leader>cf) keys live in their plugin specs.
 
 -- ============================================================
 -- Git (<leader>g prefix)
@@ -113,19 +84,3 @@ end, { desc = "Git log" })
 -- map("n", "<leader>gg", function()
 --   require("lazygit").open()
 -- end, { desc = "LazyGit" })
-
--- ============================================================
--- Clear search highlight
--- ============================================================
-
-map("n", "<leader><Esc>", function()
-	vim.cmd("nohlsearch")
-end, { desc = "Clear search highlight" })
-
--- ============================================================
--- Which-key helper
--- ============================================================
-
-map("n", "<leader>?", function()
-	require("which-key").show({ global = false })
-end, { desc = "Buffer Local Keymaps (which-key)" })

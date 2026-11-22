@@ -123,23 +123,10 @@ return {
 				},
 				{
 					function()
-						local ok, lazy = pcall(require, "lazy")
-						if not ok then
-							return ""
-						end
-						local stats = lazy.stats()
-						if not stats or stats.pending == 0 then
-							return ""
-						end
-						return "󰒲 " .. stats.pending
+						return require("lazy.status").updates()
 					end,
 					cond = function()
-						local ok, lazy = pcall(require, "lazy")
-						if not ok then
-							return false
-						end
-						local stats = lazy.stats()
-						return stats and stats.pending and stats.pending > 0
+						return require("lazy.status").has_updates()
 					end,
 					color = { fg = "#f38ba8", gui = "bold" },
 					padding = { left = 1, right = 1 },
@@ -208,9 +195,8 @@ return {
 			"mason",
 			"quickfix",
 			"fugitive",
-			"trouble",
-			"nvim-tree",
-			"toggleterm",
+			"neo-tree",
+			"oil",
 		},
 	},
 }
