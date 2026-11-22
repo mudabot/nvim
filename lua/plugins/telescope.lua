@@ -46,7 +46,8 @@ return {
         desc = "Help tags",
       },
     },
-    opts = {
+    opts = function()
+     return {
       defaults = {
         layout_strategy = "horizontal",
         layout_config = {
@@ -122,7 +123,8 @@ return {
           case_mode = "smart_case",
         },
       },
-    },
+     }
+    end,
     config = function(_, opts)
       local telescope = require("telescope")
 
