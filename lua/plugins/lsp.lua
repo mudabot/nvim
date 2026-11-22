@@ -138,7 +138,7 @@ return {
 	-- prettier needs Node/npm.
 	{
 		"WhoIsSethDaniel/mason-tool-installer.nvim",
-		lazy = "false,",
+		lazy = false,
 		dependencies = { "mason-org/mason.nvim" },
 		opts = {
 			ensure_installed = { "stylua", "black", "isort", "prettier", "shfmt" },
