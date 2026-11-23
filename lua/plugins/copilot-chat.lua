@@ -9,5 +9,11 @@ return {
 	keys = {
 		{ "<leader>cc", "<cmd>CopilotChatToggle<cr>", mode = { "n", "v" }, desc = "Copilot Chat" },
 	},
-	opts = {},
+
+	opts = {
+		model = "auto",
+		mappings = {
+			complete = { insert = "<Tab>" },
+		},
+	},
 }
